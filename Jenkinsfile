@@ -1,8 +1,7 @@
-
 pipeline {
 agent any
 
-
+```
 stages {
     stage('Install Dependencies') {
         steps {
@@ -28,8 +27,10 @@ stages {
 
     stage('Build Docker Image') {
         steps {
+            echo "Selecting Docker Desktop context"
+            bat 'docker --context desktop-linux version'
             echo "Building Docker image"
-            bat 'docker build -t varshithaa777/registration-form:latest .'
+            bat 'docker --context desktop-linux build -t varshithaa777/registration-form:latest .'
         }
     }
 
@@ -43,7 +44,7 @@ stages {
                     passwordVariable: 'DOCKER_PASSWORD'
                 )
             ]) {
-                bat 'echo %DOCKER_PASSWORD%| docker login -u "%DOCKER_USERNAME%" --password-stdin'
+                bat 'echo %DOCKER_PASSWORD%| docker --context desktop-linux login -u "%DOCKER_USERNAME%" --password-stdin'
             }
         }
     }
@@ -51,7 +52,7 @@ stages {
     stage('Push Docker Image') {
         steps {
             echo "Pushing Docker image"
-            bat 'docker push varshithaa777/registration-form:latest'
+            bat 'docker --context desktop-linux push varshithaa777/registration-form:latest'
         }
     }
 
@@ -73,7 +74,6 @@ stages {
     }
 }
 
-
 post {
     success {
         echo 'Pipeline completed successfully!'
@@ -82,7 +82,6 @@ post {
         echo 'Pipeline failed. Please check the console output.'
     }
 }
-
+```
 
 }
-
