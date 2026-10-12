@@ -1,7 +1,5 @@
 pipeline {
 agent any
-
-```
 stages {
     stage('Install Dependencies') {
         steps {
@@ -82,6 +80,5 @@ post {
         echo 'Pipeline failed. Please check the console output.'
     }
 }
-```
 
 }
