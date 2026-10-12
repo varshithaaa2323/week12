@@ -1,0 +1,86 @@
+```groovy
+pipeline {
+    agent any
+
+    stages {
+        stage('Install Dependencies') {
+            steps {
+                echo "Installing Python dependencies"
+                bat 'python -m pip install -r requirements.txt'
+            }
+        }
+
+        stage('Start Flask Application') {
+            steps {
+                echo "Starting Flask application"
+                bat 'start "FlaskApp" /B python app.py'
+                bat 'ping 127.0.0.1 -n 6 > nul'
+            }
+        }
+
+        stage('Run Selenium Tests') {
+            steps {
+                echo "Running Selenium tests"
+                bat 'python -m pytest tests -v'
+            }
+        }
+
+        stage('Build Docker Image') {
+            steps {
+                echo "Building Docker image"
+                bat 'docker build -t varshithaa777/registration-form:latest .'
+            }
+        }
+
+        stage('Docker Login') {
+            steps {
+                echo "Logging into Docker Hub"
+
+                withCredentials([
+                    usernamePassword(
+                        credentialsId: 'dockerhub-credentials',
+                        usernameVariable: 'DOCKER_USERNAME',
+                        passwordVariable: 'DOCKER_PASSWORD'
+                    )
+                ]) {
+                    bat 'echo %DOCKER_PASSWORD% | docker login -u "%DOCKER_USERNAME%" --password-stdin'
+                }
+            }
+        }
+
+        stage('Push Docker Image') {
+            steps {
+                echo "Pushing Docker image"
+                bat 'docker push varshithaa777/registration-form:latest'
+            }
+        }
+
+        stage('Deploy to Kubernetes') {
+            steps {
+                echo "Deploying to Kubernetes"
+                bat 'kubectl apply -f deployment.yaml'
+                bat 'kubectl apply -f service.yaml'
+            }
+        }
+
+        stage('Verify Deployment') {
+            steps {
+                echo "Checking Kubernetes resources"
+                bat 'kubectl get deployments'
+                bat 'kubectl get pods'
+                bat 'kubectl get services'
+            }
+        }
+    }
+
+    post {
+        success {
+            echo 'Pipeline completed successfully!'
+        }
+
+        failure {
+            echo 'Pipeline failed. Please check the console output.'
+        }
+    }
+}
+```

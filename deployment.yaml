@@ -1,0 +1,22 @@
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: registration-form-deployment
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: registration-form
+  template:
+    metadata:
+      labels:
+        app: registration-form
+    spec:
+      containers:
+        - name: registration-form
+          image: varshithaa777/registration-form:latest
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 5000
+
