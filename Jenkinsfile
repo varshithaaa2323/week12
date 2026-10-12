@@ -1,5 +1,11 @@
 pipeline {
 agent any
+
+environment {
+    DOCKER_CONFIG = 'C:/Users/VARSHITHA/.docker'
+    KUBECONFIG = 'C:/Users/VARSHITHA/.kube/config'
+}
+
 stages {
     stage('Install Dependencies') {
         steps {
@@ -25,7 +31,7 @@ stages {
 
     stage('Build Docker Image') {
         steps {
-            echo "Selecting Docker Desktop context"
+            echo "Checking Docker Desktop context"
             bat 'docker --context desktop-linux version'
             echo "Building Docker image"
             bat 'docker --context desktop-linux build -t varshithaa777/registration-form:latest .'
@@ -80,5 +86,6 @@ post {
         echo 'Pipeline failed. Please check the console output.'
     }
 }
+
 
 }
